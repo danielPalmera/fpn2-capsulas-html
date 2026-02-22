@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Demo permisos: cámara, micrófono, geolocalización</title>
+  <style>
+    body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;padding:1.5rem}
+    button{margin:.25rem}
+    .status{margin-top:1rem;background:#f6f6f6;padding:1rem;border-radius:6px}
+    .note{font-size:.9rem;color:#555;margin-top:.5rem}
+    code{background:#eee;padding:.15rem .3rem;border-radius:3px}
+  </style>
+</head>
+<body>
+  <h1>Demo: solicitar permisos</h1>
+  <p>Este demo pide permisos de <strong>cámara</strong>, <strong>micrófono</strong> y <strong>geolocalización</strong>.</p>
+
+  <div>
+    <button id="btnCam">Pedir cámara</button>
+    <button id="btnMic">Pedir micrófono</button>
+    <button id="btnCamMic">Pedir cámara + micrófono</button>
+    <button id="btnGeo">Pedir geolocalización</button>
+    <button id="btnCheck">Comprobar estados</button>
+    <button id="btnStop">Detener vista previa</button>
+  </div>
+
+  <div class="status" id="status">
+    <div><strong>Estado:</strong></div>
+    <ul>
+      <li>Cámara: <span id="st-camera">-</span></li>
+      <li>Micrófono: <span id="st-microphone">-</span></li>
+      <li>Geolocalización: <span id="st-geolocation">-</span></li>
+    </ul>
+  </div>
+
+  <p class="note">Nota: para solicitar cámara/micrófono/geo necesitas servir este archivo vía <code>https</code> o usar <code>localhost</code>.</p>
+
+  <video id="preview" autoplay playsinline muted style="width:100%;max-width:640px;border:1px solid #ccc;border-radius:6px;display:none;margin-top:1rem"></video>
+
+  <script>
+    const stCamera = document.getElementById('st-camera');
+    const stMic = document.getElementById('st-microphone');
+    const stGeo = document.getElementById('st-geolocation');
+
+    async function requestCamera(){
+      try{
+        const stream = await navigator.mediaDevices.getUserMedia({video:true});
+        attachPreview(stream);
+        stCamera.textContent = 'granted (acceso concedido)';
+      }catch(err){
+        stCamera.textContent = 'denied / error: ' + (err.name||err.message);
+      }
+    }
+
+    async function requestMicrophone(){
+      try{
+        const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+        // no preview for audio-only; stop tracks to release microphone after checking
+        stopTracks(stream);
+        stMic.textContent = 'granted (acceso concedido)';
+      }catch(err){
+        stMic.textContent = 'denied / error: ' + (err.name||err.message);
+      }
+    }
+
+    async function requestCamMic(){
+      try{
+        const stream = await navigator.mediaDevices.getUserMedia({video:true,audio:true});
+        attachPreview(stream);
+        stCamera.textContent = 'granted (acceso concedido)';
+        stMic.textContent = 'granted (acceso concedido)';
+      }catch(err){
+        stCamera.textContent = 'denied / error: ' + (err.name||err.message);
+        stMic.textContent = 'denied / error: ' + (err.name||err.message);
+      }
+    }
+
+    function stopTracks(stream){
+      if(!stream) return;
+      stream.getTracks().forEach(t => t.stop());
+    }
+
+    // preview handling
+    const preview = document.getElementById('preview');
+    let currentStream = null;
+    function attachPreview(stream){
+      // stop existing
+      if(currentStream) stopPreview();
+      currentStream = stream;
+      try{
+        preview.srcObject = stream;
+        preview.muted = true; // allow autoplay
+        preview.style.display = 'block';
+        preview.play().catch(()=>{});
+      }catch(e){
+        console.warn('No se pudo mostrar preview', e);
+      }
+    }
+
+    function stopPreview(){
+      if(!currentStream) return;
+      stopTracks(currentStream);
+      currentStream = null;
+      preview.pause();
+      preview.srcObject = null;
+      preview.style.display = 'none';
+    }
+
+    function requestGeolocation(){
+      if(!('geolocation' in navigator)){
+        stGeo.textContent = 'no soportado';
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          stGeo.textContent = `granted (lat: ${pos.coords.latitude.toFixed(4)}, lon: ${pos.coords.longitude.toFixed(4)})`;
+        },
+        err => {
+          stGeo.textContent = 'denied / error: ' + err.message;
+        },
+        { timeout: 10000 }
+      );
+    }
+
+    async function checkPermission(name){
+      if(!('permissions' in navigator)) return 'no soportado';
+      try{
+        // algunos navegadores no soportan 'camera'/'microphone' en Permissions API
+        const status = await navigator.permissions.query({name});
+        return status.state;
+      }catch(e){
+        return 'no disponible';
+      }
+    }
+
+    async function checkAll(){
+      // comprobar camera/microphone/geolocation via Permissions API cuando sea posible
+      const cam = await checkPermission('camera');
+      const mic = await checkPermission('microphone');
+      const geo = await checkPermission('geolocation');
+      stCamera.textContent = cam;
+      stMic.textContent = mic;
+      stGeo.textContent = geo;
+    }
+
+    document.getElementById('btnCam').addEventListener('click', requestCamera);
+    document.getElementById('btnMic').addEventListener('click', requestMicrophone);
+    document.getElementById('btnCamMic').addEventListener('click', requestCamMic);
+    document.getElementById('btnGeo').addEventListener('click', requestGeolocation);
+    document.getElementById('btnCheck').addEventListener('click', checkAll);
+    document.getElementById('btnStop').addEventListener('click', stopPreview);
+    // Auto-request permissions on load: first camera+mic, then geolocation
+    async function autoRequest(){
+      // small delay to ensure page rendered and user sees prompt
+      try{
+        await requestCamMic();
+      }catch(e){
+        // ignore - requestCamMic already updates status
+      }
+      setTimeout(()=>{
+        try{ requestGeolocation(); }catch(e){}
+      }, 700);
+    }
+
+    window.addEventListener('DOMContentLoaded', ()=>{
+      // Only attempt automatic requests when running on secure context (https or localhost)
+      if(location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1'){
+        autoRequest();
+      }else{
+        const note = document.querySelector('.note');
+        if(note) note.textContent += ' (Auto-request requires HTTPS or localhost; running in insecure context will not show prompts.)';
+      }
+    });
+  </script>
+</body>
+</html>
