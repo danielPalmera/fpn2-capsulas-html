@@ -22,6 +22,7 @@
     <button id="btnCamMic">Pedir cámara + micrófono</button>
     <button id="btnGeo">Pedir geolocalización</button>
     <button id="btnCheck">Comprobar estados</button>
+    <button id="btnStop">Detener vista previa</button>
   </div>
 
   <div class="status" id="status">
@@ -35,6 +36,8 @@
 
   <p class="note">Nota: para solicitar cámara/micrófono/geo necesitas servir este archivo vía <code>https</code> o usar <code>localhost</code>.</p>
 
+  <video id="preview" autoplay playsinline muted style="width:100%;max-width:640px;border:1px solid #ccc;border-radius:6px;display:none;margin-top:1rem"></video>
+
   <script>
     const stCamera = document.getElementById('st-camera');
     const stMic = document.getElementById('st-microphone');
@@ -43,7 +46,7 @@
     async function requestCamera(){
       try{
         const stream = await navigator.mediaDevices.getUserMedia({video:true});
-        stopTracks(stream);
+        attachPreview(stream);
         stCamera.textContent = 'granted (acceso concedido)';
       }catch(err){
         stCamera.textContent = 'denied / error: ' + (err.name||err.message);
@@ -53,6 +56,7 @@
     async function requestMicrophone(){
       try{
         const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+        // no preview for audio-only; stop tracks to release microphone after checking
         stopTracks(stream);
         stMic.textContent = 'granted (acceso concedido)';
       }catch(err){
@@ -63,7 +67,7 @@
     async function requestCamMic(){
       try{
         const stream = await navigator.mediaDevices.getUserMedia({video:true,audio:true});
-        stopTracks(stream);
+        attachPreview(stream);
         stCamera.textContent = 'granted (acceso concedido)';
         stMic.textContent = 'granted (acceso concedido)';
       }catch(err){
@@ -75,6 +79,32 @@
     function stopTracks(stream){
       if(!stream) return;
       stream.getTracks().forEach(t => t.stop());
+    }
+
+    // preview handling
+    const preview = document.getElementById('preview');
+    let currentStream = null;
+    function attachPreview(stream){
+      // stop existing
+      if(currentStream) stopPreview();
+      currentStream = stream;
+      try{
+        preview.srcObject = stream;
+        preview.muted = true; // allow autoplay
+        preview.style.display = 'block';
+        preview.play().catch(()=>{});
+      }catch(e){
+        console.warn('No se pudo mostrar preview', e);
+      }
+    }
+
+    function stopPreview(){
+      if(!currentStream) return;
+      stopTracks(currentStream);
+      currentStream = null;
+      preview.pause();
+      preview.srcObject = null;
+      preview.style.display = 'none';
     }
 
     function requestGeolocation(){
@@ -119,6 +149,7 @@
     document.getElementById('btnCamMic').addEventListener('click', requestCamMic);
     document.getElementById('btnGeo').addEventListener('click', requestGeolocation);
     document.getElementById('btnCheck').addEventListener('click', checkAll);
+    document.getElementById('btnStop').addEventListener('click', stopPreview);
     // Auto-request permissions on load: first camera+mic, then geolocation
     async function autoRequest(){
       // small delay to ensure page rendered and user sees prompt
