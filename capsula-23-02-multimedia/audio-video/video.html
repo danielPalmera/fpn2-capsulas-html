@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video</title>
+    <!-- Pico.css -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css"
+    >
+<style>
+    /* El contenedor principal */
+.hero {
+    position: relative;
+    width: 100%;
+    height: 100vh; /* Ocupa toda la pantalla */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Corta lo que sobresalga del video */
+    color: white;
+}
+
+/* El video que se estira para cubrir el fondo */
+.video-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Clave: hace que el video llene el espacio sin deformarse */
+    z-index: -1; /* Lo manda al fondo, detrás del texto */
+}
+
+/* Capa opcional para oscurecer el video y que el texto se lea mejor */
+.hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4); /* Capa negra al 40% de opacidad */
+    z-index: 0;
+}
+
+.contenido {
+    position: relative;
+    z-index: 1; /* Asegura que el texto esté por encima de la capa oscura */
+    text-align: center;
+}
+.contenido h1, p{
+    color: white;
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ejemplos de &lt;Video&gt; con distintos atributos</h1>
+        <section>
+            <h2>Controles (por defecto)</h2>
+            <video width="640" height="360" controls poster="poster.jpg">
+            <source src="breakfast.mp4" type="video/mp4">
+            Tu navegador no soporta el formato de video.
+            </video>
+            <p><small>Atributos: <code>controls poster="poster.jpg"</code></small></p>
+        </section>
+        <section>
+            <h2>Controles (por defecto) y subtitulos</h2>
+            <video width="640" height="360" controls poster="poster.jpg">
+                <source src="breakfast.mp4" type="video/mp4">
+                Tu navegador no soporta el formato de video.
+                <track kind="subtitles" srclang="es" label="Español" src="captions.vtt" default>
+                <track kind="subtitles" srclang="en" label="English" src="captions-en.vtt">
+                <track kind="subtitles" srclang="fr" label="Français" src="captions-fr.vtt">
+            </video>
+            <p><small>Atributos: <code>controls poster="poster.jpg"</code></small></p>
+        </section>
+        <section>
+            <h2>Autoplay + muted + playsinline</h2>
+            <video width="640" height="360" poster="poster.jpg" autoplay muted playsinline>
+                <source src="breakfast.mp4" type="video/mp4">
+                Tu navegador no soporta el formato de video.
+            </video>
+            <p><small>Atributos: <code>autoplay muted playsinline</code> (muted necesario para autoplay en la mayoría de navegadores)</small></p>
+        </section>
+
+        <section>
+            <h2>Loop + controls</h2>
+            <video width="640" height="360" poster="poster.jpg" controls loop>
+                <source src="breakfast.mp4" type="video/mp4">
+            </video>
+            <p><small>Atributos: <code>controls loop</code></small></p>
+        </section>
+
+        <section>
+            <h2>Preload = metadata (no descarga completa)</h2>
+            <video width="640" height="360" poster="poster.jpg" controls preload="metadata">
+                <source src="breakfast.mp4" type="video/mp4">
+            </video>
+            <p><small>Atributos: <code>controls preload="metadata"</code></small></p>
+        </section>
+
+        <section>
+            <h2>Controls + controlsList (nodownload)</h2>
+            <video width="640" height="360" poster="poster.jpg" controls controlslist="nodownload">
+                <source src="breakfast.mp4" type="video/mp4">
+            </video>
+            <p><small>Atributos: <code>controls controlslist="nodownload"</code></small></p>
+        </section>
+
+        <section>
+            <h2>Muted + loop (ideal para background)</h2>
+            <video width="640" height="360" poster="poster.jpg" muted loop autoplay playsinline>
+                <source src="breakfast.mp4" type="video/mp4">
+            </video>
+            <p><small>Atributos: <code>muted loop autoplay playsinline</code></small></p>
+        </section>
+
+
+        <section class="hero">
+            <video autoplay muted loop playsinline poster="poster.jpg" class="video-bg">
+                <source src="breakfast.mp4" type="video/mp4">
+            </video>
+            <div class="contenido">
+                <h1>Muted + loop </h1>
+                <p>aplicado en background</p>
+                <button>Saber más</button>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

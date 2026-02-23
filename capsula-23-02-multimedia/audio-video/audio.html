@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio audio</title>
+    <!-- Pico.css -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css"
+    >
+
+</head>
+<body>
+    <div class="container">
+        <h1>Ejemplos de &lt;audio&gt; con distintos atributos</h1>
+        <section>
+            <h2>Controles (por defecto)</h2>
+            <audio src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" controls>
+                Tu navegador no soporta el elemento de audio.
+            </audio>
+        </section>
+        <section>
+            <h2>Loop</h2>
+            <audio controls loop>
+                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3" />
+            </audio>
+            <p><small>atributos: <code>controls loop</code></small></p>
+        </section>
+        <section>
+            <h2>Muted</h2>
+            <audio controls muted>
+                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3" />
+            </audio>
+            <p><small>atributos: <code>controls muted</code></small></p>
+        </section>
+        <section>
+            <h2>Preload = none (no cargar hasta interacción)</h2>
+            <audio controls preload="none">
+                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3" />
+            </audio>
+            <p><small>atributos: <code>controls preload="none"</code></small></p>
+        </section>
+
+        <section>
+            <h2>Controls list (evitar descarga en controles compatibles)</h2>
+            <audio controls controlslist="nodownload">
+                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3" />
+            </audio>
+            <p><small>atributos: <code>controls controlslist="nodownload"</code></small></p>
+        </section>
+    </div>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Audio</title>
+    <!-- Pico.css -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css"
+    >
+
+</head>
+<body>
+    <div class="container">
+        
+        <h1>Carga de audio mediante Web Audio Api</h1>
+        <section>
+            <h2>Ejemplo Basico</h2>
+            <button id="miBotonPlay">Play</button>
+            <button id="miBotonPause">Pause</button>
+        </section>
+    </div>
+    <script>
+        const sonido = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+        // Para reproducirlo al hacer clic en un botón
+        document.querySelector('#miBotonPlay').addEventListener('click', () => {
+            sonido.play();
+        });
+        document.querySelector('#miBotonPause').addEventListener('click', () => {
+            sonido.pause();
+        });
+    </script>
+</body>
+</html>

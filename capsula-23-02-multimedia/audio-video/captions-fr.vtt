@@ -1,0 +1,10 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:05.000
+Bienvenue dans la démo de sous-titres WebVTT.
+
+00:00:05.500 --> 00:00:10.000
+Ceci est un sous-titre d'exemple en français.
+
+00:00:10.500 --> 00:00:15.000
+Vous pouvez modifier ce fichier pour ajouter vos propres lignes.

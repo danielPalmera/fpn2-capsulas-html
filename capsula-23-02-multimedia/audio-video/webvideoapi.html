@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Audio</title>
+    <!-- Pico.css -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css"
+    >
+
+</head>
+<body>
+    <div class="container">
+        <h1>carga mediante HTML5 Video API</h1>
+        <div class="video-container" style="width: 600px;">
+            <video id="miVideo" width="600" preload="metadata">
+                <source src="breakfast.mp4" type="video/mp4">
+                Tu navegador no soporta video.
+            </video>
+            <div class="controles">
+                <button id="btnPlay">Play / Pausa</button>
+                <input type="range" id="barraProgreso" value="0" step="0.1">
+            </div>
+        </div>
+    </div>
+    <script>
+        const video = document.getElementById('miVideo');
+        const btnPlay = document.getElementById('btnPlay');
+        const barra = document.getElementById('barraProgreso');
+
+        // 1. Alternar Play/Pausa
+        btnPlay.addEventListener('click', () => {
+        if (video.paused) {
+            video.play();
+        } else {
+            video.pause();
+        }
+        });
+
+        // 2. Actualizar la barra de progreso mientras el video avanza
+        video.addEventListener('timeupdate', () => {
+        const porcentaje = (video.currentTime / video.duration) * 100;
+        barra.value = porcentaje;
+        });
+
+        // 3. Saltar a una parte del video al mover la barra
+        barra.addEventListener('input', () => {
+        const tiempoDestino = (barra.value * video.duration) / 100;
+        video.currentTime = tiempoDestino;
+        });
+
+    </script>
+</body>
+</html>

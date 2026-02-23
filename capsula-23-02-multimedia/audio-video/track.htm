@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Video con Subtítulos</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css">
+  <style>
+    .wrap{max-width:960px;margin:2rem auto}
+    video{width:100%;height:auto;display:block;border:1px solid #ddd;border-radius:6px}
+    .note{font-size:.9rem;color:#555;margin-top:.5rem}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Video con <code>&lt;track&gt;</code> (subtítulos)</h1>
+
+    <video id="player" controls crossorigin="anonymous" poster="poster.jpg">
+      <source src="breakfast.mp4" type="video/mp4">
+      <!-- Añade aquí otras fuentes si las tienes (webm, ogv) -->
+      <track kind="subtitles" srclang="es" label="Español" src="captions.vtt" default>
+      <track kind="subtitles" srclang="en" label="English" src="captions-en.vtt">
+      <track kind="subtitles" srclang="fr" label="Français" src="captions-fr.vtt">
+      Tu navegador no soporta el elemento <code>video</code>.
+    </video>
+
+
+    <p>
+      <button id="showTracks">Mostrar pistas disponibles</button>
+      <button id="toggleSubs">Alternar subtítulos</button>
+    </p>
+
+    <pre id="tracksOut" style="background:#f6f6f6;padding:0.75rem;border-radius:6px;overflow:auto"></pre>
+  </div>
+  <script>
+    const player = document.getElementById('player');
+    const out = document.getElementById('tracksOut');
+    const showBtn = document.getElementById('showTracks');
+    const toggleBtn = document.getElementById('toggleSubs');
+    showBtn.addEventListener('click', ()=>{
+      const tracks = player.textTracks || [];
+      if(tracks.length === 0) out.textContent = 'No hay pistas de texto disponibles.';
+      else{
+        let s = '';
+        for(let i=0;i<tracks.length;i++){
+          s += `${i}: kind=${tracks[i].kind} label=${tracks[i].label} lang=${tracks[i].language} mode=${tracks[i].mode}\n`;
+        }
+        out.textContent = s;
+      }
+    });
+    toggleBtn.addEventListener('click', ()=>{
+      const tracks = player.textTracks || [];
+      for(let i=0;i<tracks.length;i++){
+        tracks[i].mode = (tracks[i].mode === 'showing') ? 'hidden' : 'showing';
+      }
+    });
+  </script>
+</body>
+</html>
